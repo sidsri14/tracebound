@@ -6,6 +6,7 @@ import { loadScenario } from "./adapters/sample-data.js";
 import { runInvestigation, type RunMode } from "./runtime.js";
 
 const port = Number(process.env.PORT ?? 3000);
+const host = process.env.HOST ?? "127.0.0.1";
 const publicRoot = join(process.cwd(), "public");
 
 const server = createServer(async (request, response) => {
@@ -31,8 +32,8 @@ const server = createServer(async (request, response) => {
   }
 });
 
-server.listen(port, "127.0.0.1", () => {
-  console.log(`Tracebound listening at http://127.0.0.1:${port}`);
+server.listen(port, host, () => {
+  console.log(`Tracebound listening at http://${host}:${port}`);
 });
 
 async function serveStatic(url: string, response: ServerResponse): Promise<void> {

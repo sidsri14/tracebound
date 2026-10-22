@@ -35,6 +35,13 @@ Open `http://127.0.0.1:3000`. The CLI writes the complete result to `output/samp
 
 Three synthetic input/output pairs live under `examples/`. They cover checkout retries, a catalog cache regression, and an authentication resolver failure.
 
+The multi-stage Docker image also builds cleanly from WSL2/Linux:
+
+```bash
+docker build -t tracebound:local .
+docker run --rm -p 3000:3000 tracebound:local
+```
+
 Useful checks:
 
 ```bash
