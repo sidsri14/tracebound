@@ -64,10 +64,12 @@ export class InvestigationOrchestrator {
     const winner = assessments[0];
     if (!winner) throw new Error("Scenario requires at least one hypothesis");
     const recommendation = recommendationFor(winner, activeContext);
-    await this.addTrace(trace, "synthesizer", "Produce a cited explanation and bounded next action", activeContext, {
+    const synthesis = await this.addTrace(trace, "synthesizer", "Produce a cited explanation and bounded next action", activeContext, {
       winner,
       recommendation,
     });
+
+    const deterministicConclusion = `${winner.label} is the leading explanation. It has ${winner.supportingEvidenceIds.length} supporting and ${winner.contradictingEvidenceIds.length} contradicting evidence item(s).`;
 
     const result: InvestigationResult = {
       runId,
@@ -76,7 +78,7 @@ export class InvestigationOrchestrator {
       synthetic: scenario.synthetic,
       status: "complete",
       iterations,
-      conclusion: `${winner.label} is the leading explanation. It has ${winner.supportingEvidenceIds.length} supporting and ${winner.contradictingEvidenceIds.length} contradicting evidence item(s).`,
+      conclusion: this.generator.live ? synthesis.observation : deterministicConclusion,
       confidence: winner.confidence,
       recommendedAction: recommendation,
       assessments,
@@ -96,12 +98,19 @@ export class InvestigationOrchestrator {
     action: string,
     context: ContextItem[],
     payload: Record<string, unknown>,
-  ): Promise<void> {
+  ): Promise<AgentTrace> {
     const evidenceIds = context.map((item) => item.evidence.id);
-    const observation = await this.generator.reflect(agent, { ...payload, evidenceIds });
+    const evidence = context.map((item) => ({
+      id: item.evidence.id,
+      sourceKind: item.evidence.sourceKind,
+      sourceName: item.evidence.sourceName,
+      summary: item.evidence.summary,
+    }));
+    const observation = await this.generator.reflect(agent, { ...payload, evidenceIds, evidence });
     const entry: AgentTrace = { step: trace.length + 1, agent, action, observation, evidenceIds };
     trace.push(entry);
     await this.logger.write({ event: "agent_step", ...entry });
+    return entry;
   }
 }
 

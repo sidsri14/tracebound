@@ -13,6 +13,8 @@ X-Request-ID: <random UUID>
 
 The configured SQL should return evidence-shaped rows. The adapter accepts a top-level array or a `rows`, `data`, or `result` array. Configure the API at `http://localhost:8888/api/v1.0` for the documented local setup.
 
+For the reproducible demo, Tracebound serves its clearly labeled fixture rows at `GET /api/evidence`. Register `http://host.docker.internal:3000/api/evidence` as a Zetaris REST source, map the `rows` array, and expose it as `incident_evidence`. Zetaris then remains on the live runtime path: Tracebound queries Zetaris rather than reading its fixture files directly. Exact source-registration clicks are documented only after they are verified against the installed Zetaris version.
+
 ## Meterless World Model Engine
 
 The repository implements the engine interfaces directly:
@@ -34,7 +36,7 @@ meterless-app: tracebound
 meterless-scope: user
 ```
 
-The default documented model is `meterless/auto`. NVIDIA provider keys are configured inside Nightshift; Tracebound receives only the local Nightshift runtime token. This keeps provider credentials out of the application and repository.
+The default documented model is `meterless/auto`. NVIDIA provider keys are configured inside Nightshift; Tracebound receives only the local Nightshift runtime token. This keeps provider credentials out of the application and repository. In live mode every agent stage receives the selected evidence summaries, Nightshift writes the final explanation, and Tracebound records the actual model returned by the API rather than assuming which model handled the request.
 
 ## Verification status
 

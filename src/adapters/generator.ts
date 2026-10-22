@@ -4,11 +4,13 @@ export type AgentStage = "planner" | "investigator" | "challenger" | "evaluator"
 
 export interface Generator {
   readonly name: string;
+  readonly live: boolean;
   reflect(stage: AgentStage, payload: Record<string, unknown>): Promise<string>;
 }
 
 export class DeterministicSampleGenerator implements Generator {
   readonly name = "deterministic-sample";
+  readonly live = false;
 
   async reflect(stage: AgentStage, payload: Record<string, unknown>): Promise<string> {
     const evidenceCount = Array.isArray(payload.evidenceIds) ? payload.evidenceIds.length : 0;
@@ -27,7 +29,8 @@ export interface NightshiftConfig {
 }
 
 export class MeterlessNightshiftGenerator implements Generator {
-  readonly name: string;
+  readonly live = true;
+  private resolvedModel?: string;
   private readonly timeoutMs: number;
   private readonly retries: number;
 
@@ -35,9 +38,12 @@ export class MeterlessNightshiftGenerator implements Generator {
     requireValue(config.baseUrl, "NIGHTSHIFT_BASE_URL");
     requireValue(config.runtimeToken, "NIGHTSHIFT_RUNTIME_TOKEN");
     requireValue(config.model, "NIGHTSHIFT_MODEL");
-    this.name = `meterless-nightshift:${config.model}`;
     this.timeoutMs = config.timeoutMs ?? 20_000;
     this.retries = config.retries ?? 1;
+  }
+
+  get name(): string {
+    return `meterless-nightshift:${this.resolvedModel ?? this.config.model}`;
   }
 
   async reflect(stage: AgentStage, payload: Record<string, unknown>): Promise<string> {
@@ -70,10 +76,12 @@ export class MeterlessNightshiftGenerator implements Generator {
         });
         if (!response.ok) throw new Error(`Nightshift returned HTTP ${response.status}`);
         const body = (await response.json()) as {
+          model?: string;
           choices?: Array<{ message?: { content?: string } }>;
         };
         const content = body.choices?.[0]?.message?.content?.trim();
         if (!content) throw new Error("Nightshift returned no completion content");
+        if (body.model) this.resolvedModel = body.model;
         return content;
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));

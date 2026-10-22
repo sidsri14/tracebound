@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { DeterministicSampleGenerator } from "../src/adapters/generator.js";
+import { DeterministicSampleGenerator, type AgentStage, type Generator } from "../src/adapters/generator.js";
 import { loadScenario } from "../src/adapters/sample-data.js";
 import { InvestigationOrchestrator } from "../src/agents/orchestrator.js";
 
@@ -27,3 +27,17 @@ for (const [path, winner] of [
     assert.ok(result.confidence < 1);
   });
 }
+
+test("live generator output becomes the final explanation", async () => {
+  class LiveStub implements Generator {
+    readonly name = "meterless-nightshift:nvidia/test";
+    readonly live = true;
+    async reflect(stage: AgentStage): Promise<string> {
+      return stage === "synthesizer" ? "Nightshift produced this cited final explanation." : `${stage} complete`;
+    }
+  }
+  const { scenario, evidence } = await loadScenario("data/sample/scenario.json");
+  const result = await new InvestigationOrchestrator(new LiveStub()).run(scenario, evidence);
+  assert.equal(result.conclusion, "Nightshift produced this cited final explanation.");
+  assert.equal(result.provider, "meterless-nightshift:nvidia/test");
+});

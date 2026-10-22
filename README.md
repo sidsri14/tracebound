@@ -53,6 +53,8 @@ curl -X POST -H "content-type: application/json" -d '{"mode":"sample"}' http://1
 
 Live sponsor verification is intentionally marked **pending** until the local Zetaris API key and Nightshift runtime token are created by the account owner. No credential or fake success is bundled.
 
+The demo server exposes its synthetic rows at `GET /api/evidence`; a local Zetaris instance can register `http://host.docker.internal:3000/api/evidence` as a REST source and expose the `rows` array as `incident_evidence`. Live mode then retrieves those records through Zetaris, while Nightshift handles each reasoning stage and writes the final explanation.
+
 Copy `.env.example` to `.env`, provide real local values, load it in your shell, and run:
 
 ```bash

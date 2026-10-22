@@ -2,6 +2,7 @@ import { createReadStream } from "node:fs";
 import { access, readFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { loadScenario } from "./adapters/sample-data.js";
 import { runInvestigation, type RunMode } from "./runtime.js";
 
 const port = Number(process.env.PORT ?? 3000);
@@ -11,6 +12,10 @@ const server = createServer(async (request, response) => {
   try {
     if (request.method === "GET" && request.url === "/api/health") {
       return json(response, 200, { status: "ok", service: "tracebound", liveConfigured: liveConfigured() });
+    }
+    if (request.method === "GET" && request.url === "/api/evidence") {
+      const { evidence } = await loadScenario("data/sample/scenario.json");
+      return json(response, 200, { synthetic: true, rows: evidence });
     }
     if (request.method === "POST" && request.url === "/api/run") {
       const body = await readJson(request);
