@@ -1,0 +1,32 @@
+[
+  {
+    "sourceKind": "metric", "sourceName": "synthetic-dns-metrics", "locator": "auth:dns:servfail:18:12", "observedAt": "2026-10-22T18:12:00.000Z",
+    "summary": "DNS SERVFAIL responses for the identity-provider hostname increased from zero to 17% while upstream health checks stayed green.",
+    "details": { "servfailPercent": 17, "upstreamHealth": "green" },
+    "claims": [{ "hypothesisId": "resolver-migration", "stance": "supports", "weight": 0.95 }, { "hypothesisId": "identity-provider", "stance": "contradicts", "weight": 0.75 }]
+  },
+  {
+    "sourceKind": "deployment", "sourceName": "synthetic-network-change-log", "locator": "change:resolver-pool-b:18:09", "observedAt": "2026-10-22T18:09:00.000Z",
+    "summary": "Auth workloads moved to resolver pool B three minutes before timeouts began.",
+    "details": { "from": "resolver-pool-a", "to": "resolver-pool-b" },
+    "claims": [{ "hypothesisId": "resolver-migration", "stance": "supports", "weight": 1.0 }]
+  },
+  {
+    "sourceKind": "incident", "sourceName": "synthetic-incident-archive", "locator": "incident:INC-0991", "observedAt": "2026-08-30T08:00:00.000Z",
+    "summary": "Resolver pool B previously produced intermittent SERVFAIL responses when its forwarding rule was incomplete.",
+    "details": { "resolution": "Restored forwarding rule and drained resolver pool B" },
+    "claims": [{ "hypothesisId": "resolver-migration", "stance": "supports", "weight": 0.8 }]
+  },
+  {
+    "sourceKind": "runbook", "sourceName": "synthetic-auth-runbook", "locator": "runbook:auth:dns", "observedAt": "2026-09-20T00:00:00.000Z",
+    "summary": "When authentication DNS failures exceed 5%, canary-route one workload back to the last known-good resolver.",
+    "details": { "recommendedAction": "Canary-route one auth workload back to resolver pool A and compare SERVFAIL and timeout rates." },
+    "claims": [{ "hypothesisId": "resolver-migration", "stance": "context", "weight": 0.4 }]
+  },
+  {
+    "sourceKind": "metric", "sourceName": "synthetic-tls-metrics", "locator": "auth:tls:18:12", "observedAt": "2026-10-22T18:12:00.000Z",
+    "summary": "TLS handshake failures and client certificate expiry counters remained at zero.",
+    "details": { "handshakeFailures": 0, "expiredCertificates": 0 },
+    "claims": [{ "hypothesisId": "certificate-expiry", "stance": "contradicts", "weight": 0.95 }]
+  }
+]

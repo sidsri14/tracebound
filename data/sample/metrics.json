@@ -1,0 +1,41 @@
+[
+  {
+    "sourceKind": "metric",
+    "sourceName": "synthetic-prometheus",
+    "locator": "metrics:checkout:error-rate:2026-10-22T10:05Z",
+    "observedAt": "2026-10-22T10:05:00.000Z",
+    "summary": "Checkout error rate rose from 0.8% to 6.4% three minutes after the deployment.",
+    "details": { "beforePercent": 0.8, "afterPercent": 6.4, "service": "checkout" },
+    "claims": [{ "hypothesisId": "timeout-retry-cascade", "stance": "supports", "weight": 0.75 }]
+  },
+  {
+    "sourceKind": "metric",
+    "sourceName": "synthetic-prometheus",
+    "locator": "metrics:payments:p95:2026-10-22T10:05Z",
+    "observedAt": "2026-10-22T10:05:00.000Z",
+    "summary": "Payments p95 latency reached 2100 ms while the configured checkout timeout was 1500 ms.",
+    "details": { "paymentsP95Ms": 2100, "checkoutTimeoutMs": 1500 },
+    "claims": [{ "hypothesisId": "timeout-retry-cascade", "stance": "supports", "weight": 0.95 }]
+  },
+  {
+    "sourceKind": "metric",
+    "sourceName": "synthetic-prometheus",
+    "locator": "metrics:retries:2026-10-22T10:06Z",
+    "observedAt": "2026-10-22T10:06:00.000Z",
+    "summary": "Payment retry volume increased 3.1x while request volume stayed flat.",
+    "details": { "retryMultiplier": 3.1, "requestRateChangePercent": 1.2 },
+    "claims": [
+      { "hypothesisId": "timeout-retry-cascade", "stance": "supports", "weight": 0.9 },
+      { "hypothesisId": "traffic-spike", "stance": "contradicts", "weight": 0.9 }
+    ]
+  },
+  {
+    "sourceKind": "metric",
+    "sourceName": "synthetic-prometheus",
+    "locator": "metrics:database:saturation:2026-10-22T10:06Z",
+    "observedAt": "2026-10-22T10:06:00.000Z",
+    "summary": "Primary database saturation remained within its normal band at 62%.",
+    "details": { "saturationPercent": 62, "normalUpperPercent": 75 },
+    "claims": [{ "hypothesisId": "database-saturation", "stance": "contradicts", "weight": 0.85 }]
+  }
+]

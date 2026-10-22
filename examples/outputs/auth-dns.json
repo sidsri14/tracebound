@@ -1,0 +1,276 @@
+{
+  "runId": "run_b59b3003-6b09-48c8-b945-995acab53a70",
+  "scenarioId": "example-auth-dns",
+  "question": "Why did authentication timeouts start around 18:12 UTC?",
+  "synthetic": true,
+  "status": "complete",
+  "iterations": 2,
+  "conclusion": "Resolver migration failure is the leading explanation. It has 3 supporting and 0 contradicting evidence item(s).",
+  "confidence": 0.786,
+  "recommendedAction": "Canary-route one auth workload back to resolver pool A and compare SERVFAIL and timeout rates. Validate the change against the cited metrics before broad rollout.",
+  "assessments": [
+    {
+      "id": "resolver-migration",
+      "label": "Resolver migration failure",
+      "description": "A resolver rollout intermittently failed identity-provider lookups.",
+      "supportScore": 2.75,
+      "contradictionScore": 0,
+      "confidence": 0.786,
+      "supportingEvidenceIds": [
+        "ev_2eff7f90360cfab2",
+        "ev_e0766fce42e1de9e",
+        "ev_33eb315e631283e0"
+      ],
+      "contradictingEvidenceIds": []
+    },
+    {
+      "id": "identity-provider",
+      "label": "Identity provider outage",
+      "description": "The upstream identity provider was unavailable.",
+      "supportScore": 0,
+      "contradictionScore": 0.75,
+      "confidence": 0,
+      "supportingEvidenceIds": [],
+      "contradictingEvidenceIds": [
+        "ev_2eff7f90360cfab2"
+      ]
+    },
+    {
+      "id": "certificate-expiry",
+      "label": "Expired client certificate",
+      "description": "TLS authentication failed because a client certificate expired.",
+      "supportScore": 0,
+      "contradictionScore": 0.95,
+      "confidence": 0,
+      "supportingEvidenceIds": [],
+      "contradictingEvidenceIds": [
+        "ev_89f59276f5397a62"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "sourceKind": "incident",
+      "sourceName": "synthetic-incident-archive",
+      "locator": "incident:INC-0991",
+      "observedAt": "2026-08-30T08:00:00.000Z",
+      "summary": "Resolver pool B previously produced intermittent SERVFAIL responses when its forwarding rule was incomplete.",
+      "details": {
+        "resolution": "Restored forwarding rule and drained resolver pool B"
+      },
+      "claims": [
+        {
+          "hypothesisId": "resolver-migration",
+          "stance": "supports",
+          "weight": 0.8
+        }
+      ],
+      "id": "ev_e0766fce42e1de9e",
+      "digest": "e0766fce42e1de9e4d03c88ee64fccaa36da0e72704e816634831e3cb0fbb19c",
+      "ingestedAt": "2026-10-22T17:35:50.343Z",
+      "runId": "run_b59b3003-6b09-48c8-b945-995acab53a70",
+      "agent": "ingest-pipeline"
+    },
+    {
+      "sourceKind": "runbook",
+      "sourceName": "synthetic-auth-runbook",
+      "locator": "runbook:auth:dns",
+      "observedAt": "2026-09-20T00:00:00.000Z",
+      "summary": "When authentication DNS failures exceed 5%, canary-route one workload back to the last known-good resolver.",
+      "details": {
+        "recommendedAction": "Canary-route one auth workload back to resolver pool A and compare SERVFAIL and timeout rates."
+      },
+      "claims": [
+        {
+          "hypothesisId": "resolver-migration",
+          "stance": "context",
+          "weight": 0.4
+        }
+      ],
+      "id": "ev_657662b561385834",
+      "digest": "657662b5613858344929395be06dd96365b78c49d04283eadbe1233e6b4628c9",
+      "ingestedAt": "2026-10-22T17:35:50.343Z",
+      "runId": "run_b59b3003-6b09-48c8-b945-995acab53a70",
+      "agent": "ingest-pipeline"
+    },
+    {
+      "sourceKind": "deployment",
+      "sourceName": "synthetic-network-change-log",
+      "locator": "change:resolver-pool-b:18:09",
+      "observedAt": "2026-10-22T18:09:00.000Z",
+      "summary": "Auth workloads moved to resolver pool B three minutes before timeouts began.",
+      "details": {
+        "from": "resolver-pool-a",
+        "to": "resolver-pool-b"
+      },
+      "claims": [
+        {
+          "hypothesisId": "resolver-migration",
+          "stance": "supports",
+          "weight": 1
+        }
+      ],
+      "id": "ev_33eb315e631283e0",
+      "digest": "33eb315e631283e0567c8f0702eec03a828f6091e19851982155a642be62689c",
+      "ingestedAt": "2026-10-22T17:35:50.343Z",
+      "runId": "run_b59b3003-6b09-48c8-b945-995acab53a70",
+      "agent": "ingest-pipeline"
+    },
+    {
+      "sourceKind": "metric",
+      "sourceName": "synthetic-dns-metrics",
+      "locator": "auth:dns:servfail:18:12",
+      "observedAt": "2026-10-22T18:12:00.000Z",
+      "summary": "DNS SERVFAIL responses for the identity-provider hostname increased from zero to 17% while upstream health checks stayed green.",
+      "details": {
+        "servfailPercent": 17,
+        "upstreamHealth": "green"
+      },
+      "claims": [
+        {
+          "hypothesisId": "resolver-migration",
+          "stance": "supports",
+          "weight": 0.95
+        },
+        {
+          "hypothesisId": "identity-provider",
+          "stance": "contradicts",
+          "weight": 0.75
+        }
+      ],
+      "id": "ev_2eff7f90360cfab2",
+      "digest": "2eff7f90360cfab29e83275643adfd50e43d9be0b251203387c4d9e41b34eddc",
+      "ingestedAt": "2026-10-22T17:35:50.343Z",
+      "runId": "run_b59b3003-6b09-48c8-b945-995acab53a70",
+      "agent": "ingest-pipeline"
+    },
+    {
+      "sourceKind": "metric",
+      "sourceName": "synthetic-tls-metrics",
+      "locator": "auth:tls:18:12",
+      "observedAt": "2026-10-22T18:12:00.000Z",
+      "summary": "TLS handshake failures and client certificate expiry counters remained at zero.",
+      "details": {
+        "handshakeFailures": 0,
+        "expiredCertificates": 0
+      },
+      "claims": [
+        {
+          "hypothesisId": "certificate-expiry",
+          "stance": "contradicts",
+          "weight": 0.95
+        }
+      ],
+      "id": "ev_89f59276f5397a62",
+      "digest": "89f59276f5397a62a23920283083217a0a7d38750aaa4ad40f8e3ae3bc3f16ba",
+      "ingestedAt": "2026-10-22T17:35:50.343Z",
+      "runId": "run_b59b3003-6b09-48c8-b945-995acab53a70",
+      "agent": "ingest-pipeline"
+    }
+  ],
+  "trace": [
+    {
+      "step": 1,
+      "agent": "planner",
+      "action": "Form a falsifiable investigation plan",
+      "observation": "planner completed against 4 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_2eff7f90360cfab2",
+        "ev_33eb315e631283e0",
+        "ev_657662b561385834",
+        "ev_89f59276f5397a62"
+      ]
+    },
+    {
+      "step": 2,
+      "agent": "investigator",
+      "action": "Score competing hypotheses (iteration 1)",
+      "observation": "investigator completed against 4 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_2eff7f90360cfab2",
+        "ev_33eb315e631283e0",
+        "ev_657662b561385834",
+        "ev_89f59276f5397a62"
+      ]
+    },
+    {
+      "step": 3,
+      "agent": "challenger",
+      "action": "Seek contradictions and source-diversity gaps",
+      "observation": "challenger completed against 4 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_2eff7f90360cfab2",
+        "ev_33eb315e631283e0",
+        "ev_657662b561385834",
+        "ev_89f59276f5397a62"
+      ]
+    },
+    {
+      "step": 4,
+      "agent": "evaluator",
+      "action": "Request bounded retry",
+      "observation": "evaluator completed against 4 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_2eff7f90360cfab2",
+        "ev_33eb315e631283e0",
+        "ev_657662b561385834",
+        "ev_89f59276f5397a62"
+      ]
+    },
+    {
+      "step": 5,
+      "agent": "investigator",
+      "action": "Score competing hypotheses (iteration 2)",
+      "observation": "investigator completed against 5 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_2eff7f90360cfab2",
+        "ev_657662b561385834",
+        "ev_e0766fce42e1de9e",
+        "ev_33eb315e631283e0",
+        "ev_89f59276f5397a62"
+      ]
+    },
+    {
+      "step": 6,
+      "agent": "challenger",
+      "action": "Seek contradictions and source-diversity gaps",
+      "observation": "challenger completed against 5 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_2eff7f90360cfab2",
+        "ev_657662b561385834",
+        "ev_e0766fce42e1de9e",
+        "ev_33eb315e631283e0",
+        "ev_89f59276f5397a62"
+      ]
+    },
+    {
+      "step": 7,
+      "agent": "evaluator",
+      "action": "Accept evidence coverage",
+      "observation": "evaluator completed against 5 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_2eff7f90360cfab2",
+        "ev_657662b561385834",
+        "ev_e0766fce42e1de9e",
+        "ev_33eb315e631283e0",
+        "ev_89f59276f5397a62"
+      ]
+    },
+    {
+      "step": 8,
+      "agent": "synthesizer",
+      "action": "Produce a cited explanation and bounded next action",
+      "observation": "synthesizer completed against 5 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_2eff7f90360cfab2",
+        "ev_657662b561385834",
+        "ev_e0766fce42e1de9e",
+        "ev_33eb315e631283e0",
+        "ev_89f59276f5397a62"
+      ]
+    }
+  ],
+  "provider": "deterministic-sample",
+  "startedAt": "2026-10-22T17:35:50.328Z",
+  "completedAt": "2026-10-22T17:35:50.353Z"
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Tracebound",
+  "track": "The Agent That Can Explain Why",
+  "event": "Open Agent Hackathon 2026",
+  "team": "Tracebound",
+  "startedAt": "2026-10-22T17:29:38Z",
+  "data": "Synthetic sample fixtures; live mode via Zetaris",
+  "sponsorTechnologies": [
+    "Zetaris",
+    "Meterless World Model Engine",
+    "Meterless Nightshift",
+    "NVIDIA via Nightshift provider"
+  ]
+}

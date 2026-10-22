@@ -1,0 +1,32 @@
+[
+  {
+    "sourceKind": "metric", "sourceName": "synthetic-metrics", "locator": "catalog:p95:14:34", "observedAt": "2026-10-22T14:34:00.000Z",
+    "summary": "Catalog p95 rose from 180 ms to 980 ms as cache hit rate fell from 91% to 38%; traffic stayed flat.",
+    "details": { "p95BeforeMs": 180, "p95AfterMs": 980, "cacheHitBeforePercent": 91, "cacheHitAfterPercent": 38 },
+    "claims": [{ "hypothesisId": "cache-bypass", "stance": "supports", "weight": 0.95 }, { "hypothesisId": "traffic-spike", "stance": "contradicts", "weight": 0.85 }]
+  },
+  {
+    "sourceKind": "deployment", "sourceName": "synthetic-deploy-log", "locator": "deploy:catalog:cache-policy-v3", "observedAt": "2026-10-22T14:30:00.000Z",
+    "summary": "Cache policy v3 enabled bypass for the product-detail key prefix four minutes before latency rose.",
+    "details": { "flag": "cache-policy-v3", "changedPrefix": "product-detail" },
+    "claims": [{ "hypothesisId": "cache-bypass", "stance": "supports", "weight": 1.0 }]
+  },
+  {
+    "sourceKind": "incident", "sourceName": "synthetic-incident-archive", "locator": "incident:INC-0955", "observedAt": "2026-07-02T11:00:00.000Z",
+    "summary": "A previous cache bypass caused the same hit-rate and origin-latency signature.",
+    "details": { "resolution": "Disabled bypass and warmed hot keys" },
+    "claims": [{ "hypothesisId": "cache-bypass", "stance": "supports", "weight": 0.75 }]
+  },
+  {
+    "sourceKind": "runbook", "sourceName": "synthetic-catalog-runbook", "locator": "runbook:catalog:cache-regression", "observedAt": "2026-09-12T00:00:00.000Z",
+    "summary": "For a cache hit-rate regression, canary-disable the latest policy and warm the affected prefix.",
+    "details": { "recommendedAction": "Canary-disable cache-policy-v3 for product-detail keys and warm that prefix." },
+    "claims": [{ "hypothesisId": "cache-bypass", "stance": "context", "weight": 0.4 }]
+  },
+  {
+    "sourceKind": "metric", "sourceName": "synthetic-database-metrics", "locator": "catalog:db-locks:14:34", "observedAt": "2026-10-22T14:34:00.000Z",
+    "summary": "Database lock waits remained at baseline during the catalog regression.",
+    "details": { "lockWaitP95Ms": 4, "baselineP95Ms": 5 },
+    "claims": [{ "hypothesisId": "database-locks", "stance": "contradicts", "weight": 0.9 }]
+  }
+]

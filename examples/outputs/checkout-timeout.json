@@ -1,0 +1,337 @@
+{
+  "runId": "run_ad5462dc-6974-40d8-860a-c1d5026a0180",
+  "scenarioId": "example-checkout-timeout",
+  "question": "Why did checkout error rate increase shortly after 10:00 UTC?",
+  "synthetic": true,
+  "status": "complete",
+  "iterations": 2,
+  "conclusion": "Payments timeout and retry cascade is the leading explanation. It has 5 supporting and 0 contradicting evidence item(s).",
+  "confidence": 0.854,
+  "recommendedAction": "Canary a restoration of the payments timeout to 3000 ms and cap retries at one. Validate the change against the cited metrics before broad rollout.",
+  "assessments": [
+    {
+      "id": "timeout-retry-cascade",
+      "label": "Payments timeout and retry cascade",
+      "description": "A shorter downstream timeout plus more retries amplified latency into checkout failures.",
+      "supportScore": 4.4,
+      "contradictionScore": 0,
+      "confidence": 0.854,
+      "supportingEvidenceIds": [
+        "ev_f5fc8a4d31feea21",
+        "ev_3cddd308f71710ab",
+        "ev_b10639d092556b05",
+        "ev_5667239ffbaf3143",
+        "ev_5cd300baacefbe46"
+      ],
+      "contradictingEvidenceIds": []
+    },
+    {
+      "id": "database-saturation",
+      "label": "Primary database saturation",
+      "description": "Database resource exhaustion caused slow requests and checkout failures.",
+      "supportScore": 0,
+      "contradictionScore": 0.85,
+      "confidence": 0,
+      "supportingEvidenceIds": [],
+      "contradictingEvidenceIds": [
+        "ev_0e3fb162abe92bd5"
+      ]
+    },
+    {
+      "id": "traffic-spike",
+      "label": "Unexpected traffic spike",
+      "description": "A sudden increase in request volume exhausted checkout capacity.",
+      "supportScore": 0,
+      "contradictionScore": 0.9,
+      "confidence": 0,
+      "supportingEvidenceIds": [],
+      "contradictingEvidenceIds": [
+        "ev_f5fc8a4d31feea21"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "sourceKind": "incident",
+      "sourceName": "synthetic-incident-archive",
+      "locator": "incident:INC-1042",
+      "observedAt": "2026-08-14T15:20:00.000Z",
+      "summary": "A prior incident showed the same payments latency and retry-storm signature after a timeout reduction.",
+      "details": {
+        "incidentId": "INC-1042",
+        "resolution": "Restored timeout and capped retries"
+      },
+      "claims": [
+        {
+          "hypothesisId": "timeout-retry-cascade",
+          "stance": "supports",
+          "weight": 0.8
+        }
+      ],
+      "id": "ev_3cddd308f71710ab",
+      "digest": "3cddd308f71710abb87e8bd5d9b4559f040a733969b12b83d65874c800e539a2",
+      "ingestedAt": "2026-10-22T17:35:50.317Z",
+      "runId": "run_ad5462dc-6974-40d8-860a-c1d5026a0180",
+      "agent": "ingest-pipeline"
+    },
+    {
+      "sourceKind": "runbook",
+      "sourceName": "synthetic-checkout-runbook",
+      "locator": "runbook:checkout:payment-latency",
+      "observedAt": "2026-09-01T00:00:00.000Z",
+      "summary": "For payment latency above the checkout timeout, restore the last known-good timeout and cap retries before wider rollback.",
+      "details": {
+        "recommendedAction": "Canary a restoration of the payments timeout to 3000 ms and cap retries at one."
+      },
+      "claims": [
+        {
+          "hypothesisId": "timeout-retry-cascade",
+          "stance": "context",
+          "weight": 0.4
+        }
+      ],
+      "id": "ev_d6f7de2410dd198f",
+      "digest": "d6f7de2410dd198f4c2e28b330d7cdfe049ffe112e27f17e8225c8f42ec8edab",
+      "ingestedAt": "2026-10-22T17:35:50.317Z",
+      "runId": "run_ad5462dc-6974-40d8-860a-c1d5026a0180",
+      "agent": "ingest-pipeline"
+    },
+    {
+      "sourceKind": "deployment",
+      "sourceName": "synthetic-deploy-log",
+      "locator": "deploy:checkout:v2.14.0",
+      "observedAt": "2026-10-22T10:02:00.000Z",
+      "summary": "Checkout v2.14.0 reduced the payments timeout from 3000 ms to 1500 ms and increased retries from one to three.",
+      "details": {
+        "version": "v2.14.0",
+        "timeoutBeforeMs": 3000,
+        "timeoutAfterMs": 1500,
+        "retriesBefore": 1,
+        "retriesAfter": 3
+      },
+      "claims": [
+        {
+          "hypothesisId": "timeout-retry-cascade",
+          "stance": "supports",
+          "weight": 1
+        }
+      ],
+      "id": "ev_b10639d092556b05",
+      "digest": "b10639d092556b053dd7ecbc1d85e1ad123b47c00ca7185c1efd4102eb0a3b25",
+      "ingestedAt": "2026-10-22T17:35:50.317Z",
+      "runId": "run_ad5462dc-6974-40d8-860a-c1d5026a0180",
+      "agent": "ingest-pipeline"
+    },
+    {
+      "sourceKind": "metric",
+      "sourceName": "synthetic-prometheus",
+      "locator": "metrics:checkout:error-rate:2026-10-22T10:05Z",
+      "observedAt": "2026-10-22T10:05:00.000Z",
+      "summary": "Checkout error rate rose from 0.8% to 6.4% three minutes after the deployment.",
+      "details": {
+        "beforePercent": 0.8,
+        "afterPercent": 6.4,
+        "service": "checkout"
+      },
+      "claims": [
+        {
+          "hypothesisId": "timeout-retry-cascade",
+          "stance": "supports",
+          "weight": 0.75
+        }
+      ],
+      "id": "ev_5667239ffbaf3143",
+      "digest": "5667239ffbaf314351a7f2758b6fa2126f8526073c562837ca9a58f799f515a4",
+      "ingestedAt": "2026-10-22T17:35:50.316Z",
+      "runId": "run_ad5462dc-6974-40d8-860a-c1d5026a0180",
+      "agent": "ingest-pipeline"
+    },
+    {
+      "sourceKind": "metric",
+      "sourceName": "synthetic-prometheus",
+      "locator": "metrics:payments:p95:2026-10-22T10:05Z",
+      "observedAt": "2026-10-22T10:05:00.000Z",
+      "summary": "Payments p95 latency reached 2100 ms while the configured checkout timeout was 1500 ms.",
+      "details": {
+        "paymentsP95Ms": 2100,
+        "checkoutTimeoutMs": 1500
+      },
+      "claims": [
+        {
+          "hypothesisId": "timeout-retry-cascade",
+          "stance": "supports",
+          "weight": 0.95
+        }
+      ],
+      "id": "ev_5cd300baacefbe46",
+      "digest": "5cd300baacefbe4654f6b8cb42c01275d4e0b3e2d9e67236e2c5b453eff6edbc",
+      "ingestedAt": "2026-10-22T17:35:50.316Z",
+      "runId": "run_ad5462dc-6974-40d8-860a-c1d5026a0180",
+      "agent": "ingest-pipeline"
+    },
+    {
+      "sourceKind": "metric",
+      "sourceName": "synthetic-prometheus",
+      "locator": "metrics:retries:2026-10-22T10:06Z",
+      "observedAt": "2026-10-22T10:06:00.000Z",
+      "summary": "Payment retry volume increased 3.1x while request volume stayed flat.",
+      "details": {
+        "retryMultiplier": 3.1,
+        "requestRateChangePercent": 1.2
+      },
+      "claims": [
+        {
+          "hypothesisId": "timeout-retry-cascade",
+          "stance": "supports",
+          "weight": 0.9
+        },
+        {
+          "hypothesisId": "traffic-spike",
+          "stance": "contradicts",
+          "weight": 0.9
+        }
+      ],
+      "id": "ev_f5fc8a4d31feea21",
+      "digest": "f5fc8a4d31feea2189e7f0e8130d593885f474b217690f86db5a646ee3593378",
+      "ingestedAt": "2026-10-22T17:35:50.317Z",
+      "runId": "run_ad5462dc-6974-40d8-860a-c1d5026a0180",
+      "agent": "ingest-pipeline"
+    },
+    {
+      "sourceKind": "metric",
+      "sourceName": "synthetic-prometheus",
+      "locator": "metrics:database:saturation:2026-10-22T10:06Z",
+      "observedAt": "2026-10-22T10:06:00.000Z",
+      "summary": "Primary database saturation remained within its normal band at 62%.",
+      "details": {
+        "saturationPercent": 62,
+        "normalUpperPercent": 75
+      },
+      "claims": [
+        {
+          "hypothesisId": "database-saturation",
+          "stance": "contradicts",
+          "weight": 0.85
+        }
+      ],
+      "id": "ev_0e3fb162abe92bd5",
+      "digest": "0e3fb162abe92bd5d4c0830e7d855be608ebfad6c67d8ec08f261f568a6e212b",
+      "ingestedAt": "2026-10-22T17:35:50.317Z",
+      "runId": "run_ad5462dc-6974-40d8-860a-c1d5026a0180",
+      "agent": "ingest-pipeline"
+    }
+  ],
+  "trace": [
+    {
+      "step": 1,
+      "agent": "planner",
+      "action": "Form a falsifiable investigation plan",
+      "observation": "planner completed against 4 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_5667239ffbaf3143",
+        "ev_f5fc8a4d31feea21",
+        "ev_3cddd308f71710ab",
+        "ev_5cd300baacefbe46"
+      ]
+    },
+    {
+      "step": 2,
+      "agent": "investigator",
+      "action": "Score competing hypotheses (iteration 1)",
+      "observation": "investigator completed against 4 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_5667239ffbaf3143",
+        "ev_f5fc8a4d31feea21",
+        "ev_3cddd308f71710ab",
+        "ev_5cd300baacefbe46"
+      ]
+    },
+    {
+      "step": 3,
+      "agent": "challenger",
+      "action": "Seek contradictions and source-diversity gaps",
+      "observation": "challenger completed against 4 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_5667239ffbaf3143",
+        "ev_f5fc8a4d31feea21",
+        "ev_3cddd308f71710ab",
+        "ev_5cd300baacefbe46"
+      ]
+    },
+    {
+      "step": 4,
+      "agent": "evaluator",
+      "action": "Request bounded retry",
+      "observation": "evaluator completed against 4 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_5667239ffbaf3143",
+        "ev_f5fc8a4d31feea21",
+        "ev_3cddd308f71710ab",
+        "ev_5cd300baacefbe46"
+      ]
+    },
+    {
+      "step": 5,
+      "agent": "investigator",
+      "action": "Score competing hypotheses (iteration 2)",
+      "observation": "investigator completed against 7 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_f5fc8a4d31feea21",
+        "ev_d6f7de2410dd198f",
+        "ev_3cddd308f71710ab",
+        "ev_b10639d092556b05",
+        "ev_5667239ffbaf3143",
+        "ev_5cd300baacefbe46",
+        "ev_0e3fb162abe92bd5"
+      ]
+    },
+    {
+      "step": 6,
+      "agent": "challenger",
+      "action": "Seek contradictions and source-diversity gaps",
+      "observation": "challenger completed against 7 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_f5fc8a4d31feea21",
+        "ev_d6f7de2410dd198f",
+        "ev_3cddd308f71710ab",
+        "ev_b10639d092556b05",
+        "ev_5667239ffbaf3143",
+        "ev_5cd300baacefbe46",
+        "ev_0e3fb162abe92bd5"
+      ]
+    },
+    {
+      "step": 7,
+      "agent": "evaluator",
+      "action": "Accept evidence coverage",
+      "observation": "evaluator completed against 7 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_f5fc8a4d31feea21",
+        "ev_d6f7de2410dd198f",
+        "ev_3cddd308f71710ab",
+        "ev_b10639d092556b05",
+        "ev_5667239ffbaf3143",
+        "ev_5cd300baacefbe46",
+        "ev_0e3fb162abe92bd5"
+      ]
+    },
+    {
+      "step": 8,
+      "agent": "synthesizer",
+      "action": "Produce a cited explanation and bounded next action",
+      "observation": "synthesizer completed against 7 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_f5fc8a4d31feea21",
+        "ev_d6f7de2410dd198f",
+        "ev_3cddd308f71710ab",
+        "ev_b10639d092556b05",
+        "ev_5667239ffbaf3143",
+        "ev_5cd300baacefbe46",
+        "ev_0e3fb162abe92bd5"
+      ]
+    }
+  ],
+  "provider": "deterministic-sample",
+  "startedAt": "2026-10-22T17:35:50.304Z",
+  "completedAt": "2026-10-22T17:35:50.326Z"
+}

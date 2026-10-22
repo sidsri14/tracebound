@@ -1,0 +1,12 @@
+{
+  "id": "example-auth-dns",
+  "title": "Authentication failures after resolver migration",
+  "question": "Why did authentication timeouts start around 18:12 UTC?",
+  "synthetic": true,
+  "evidenceFiles": ["auth-dns-evidence.json"],
+  "hypotheses": [
+    { "id": "resolver-migration", "label": "Resolver migration failure", "description": "A resolver rollout intermittently failed identity-provider lookups." },
+    { "id": "identity-provider", "label": "Identity provider outage", "description": "The upstream identity provider was unavailable." },
+    { "id": "certificate-expiry", "label": "Expired client certificate", "description": "TLS authentication failed because a client certificate expired." }
+  ]
+}

@@ -1,0 +1,11 @@
+[
+  {
+    "sourceKind": "incident",
+    "sourceName": "synthetic-incident-archive",
+    "locator": "incident:INC-1042",
+    "observedAt": "2026-08-14T15:20:00.000Z",
+    "summary": "A prior incident showed the same payments latency and retry-storm signature after a timeout reduction.",
+    "details": { "incidentId": "INC-1042", "resolution": "Restored timeout and capped retries" },
+    "claims": [{ "hypothesisId": "timeout-retry-cascade", "stance": "supports", "weight": 0.8 }]
+  }
+]

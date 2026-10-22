@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Tracebound evidence-first incident investigation demo" />
+    <title>Tracebound — explain why, with evidence</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="masthead">
+        <div class="brand"><span class="brand-mark">T</span> Tracebound</div>
+        <span class="status"><i></i> SAMPLE DATA READY</span>
+      </header>
+
+      <section class="hero">
+        <p class="eyebrow">EVIDENCE-FIRST INCIDENT INTELLIGENCE</p>
+        <h1>Don’t just name the cause.<br /><em>Show why.</em></h1>
+        <p class="dek">Tracebound tests competing explanations across fragmented operational data, challenges its own conclusion, and preserves the evidence trail.</p>
+        <div class="controls">
+          <button id="run-button">Investigate synthetic incident <span>→</span></button>
+          <label><input id="live-mode" type="checkbox" /> Use live sponsor stack</label>
+        </div>
+        <p class="disclosure">The bundled scenario is entirely synthetic. Live mode requires local Zetaris and Meterless Nightshift credentials.</p>
+      </section>
+
+      <section id="result" class="result hidden" aria-live="polite">
+        <div class="result-head">
+          <div><p class="eyebrow">LEADING EXPLANATION</p><h2 id="conclusion"></h2></div>
+          <div class="confidence"><strong id="confidence">—</strong><span>confidence</span></div>
+        </div>
+        <div class="grid">
+          <article><h3>Competing hypotheses</h3><div id="hypotheses"></div></article>
+          <article><h3>Agent audit trail</h3><ol id="trace"></ol></article>
+        </div>
+        <div class="action"><span>RECOMMENDED NEXT ACTION</span><p id="action"></p></div>
+        <details>
+          <summary>Inspect cited evidence and provenance</summary>
+          <div id="evidence" class="evidence"></div>
+        </details>
+      </section>
+
+      <footer><span>ZETARIS DATA LAYER</span><span>METERLESS NIGHTSHIFT</span><span>WORLD MODEL ENGINE</span></footer>
+    </main>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

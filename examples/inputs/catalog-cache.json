@@ -1,0 +1,12 @@
+{
+  "id": "example-catalog-cache",
+  "title": "Catalog latency after cache policy rollout",
+  "question": "Why did catalog p95 latency increase after 14:30 UTC?",
+  "synthetic": true,
+  "evidenceFiles": ["catalog-cache-evidence.json"],
+  "hypotheses": [
+    { "id": "cache-bypass", "label": "Cache bypass rollout", "description": "A new cache policy bypassed hot keys and increased origin load." },
+    { "id": "traffic-spike", "label": "Traffic spike", "description": "Request volume exceeded catalog capacity." },
+    { "id": "database-locks", "label": "Database lock contention", "description": "Lock waits slowed catalog reads." }
+  ]
+}

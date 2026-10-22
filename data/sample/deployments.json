@@ -1,0 +1,11 @@
+[
+  {
+    "sourceKind": "deployment",
+    "sourceName": "synthetic-deploy-log",
+    "locator": "deploy:checkout:v2.14.0",
+    "observedAt": "2026-10-22T10:02:00.000Z",
+    "summary": "Checkout v2.14.0 reduced the payments timeout from 3000 ms to 1500 ms and increased retries from one to three.",
+    "details": { "version": "v2.14.0", "timeoutBeforeMs": 3000, "timeoutAfterMs": 1500, "retriesBefore": 1, "retriesAfter": 3 },
+    "claims": [{ "hypothesisId": "timeout-retry-cascade", "stance": "supports", "weight": 1.0 }]
+  }
+]

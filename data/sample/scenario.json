@@ -1,0 +1,29 @@
+{
+  "id": "synthetic-checkout-2026-10-22",
+  "title": "Checkout errors after a payments configuration change",
+  "question": "Why did checkout error rate increase shortly after 10:00 UTC?",
+  "synthetic": true,
+  "evidenceFiles": [
+    "metrics.json",
+    "deployments.json",
+    "incident-history.json",
+    "runbook.json"
+  ],
+  "hypotheses": [
+    {
+      "id": "timeout-retry-cascade",
+      "label": "Payments timeout and retry cascade",
+      "description": "A shorter downstream timeout plus more retries amplified latency into checkout failures."
+    },
+    {
+      "id": "database-saturation",
+      "label": "Primary database saturation",
+      "description": "Database resource exhaustion caused slow requests and checkout failures."
+    },
+    {
+      "id": "traffic-spike",
+      "label": "Unexpected traffic spike",
+      "description": "A sudden increase in request volume exhausted checkout capacity."
+    }
+  ]
+}

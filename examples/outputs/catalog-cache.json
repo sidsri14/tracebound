@@ -1,0 +1,278 @@
+{
+  "runId": "run_ab1906a6-4fe5-46d3-90de-d43c64409595",
+  "scenarioId": "example-catalog-cache",
+  "question": "Why did catalog p95 latency increase after 14:30 UTC?",
+  "synthetic": true,
+  "status": "complete",
+  "iterations": 2,
+  "conclusion": "Cache bypass rollout is the leading explanation. It has 3 supporting and 0 contradicting evidence item(s).",
+  "confidence": 0.783,
+  "recommendedAction": "Canary-disable cache-policy-v3 for product-detail keys and warm that prefix. Validate the change against the cited metrics before broad rollout.",
+  "assessments": [
+    {
+      "id": "cache-bypass",
+      "label": "Cache bypass rollout",
+      "description": "A new cache policy bypassed hot keys and increased origin load.",
+      "supportScore": 2.7,
+      "contradictionScore": 0,
+      "confidence": 0.783,
+      "supportingEvidenceIds": [
+        "ev_7d80208bff84ed58",
+        "ev_194753b1ec5bad59",
+        "ev_7e0e1c1e1a0d830f"
+      ],
+      "contradictingEvidenceIds": []
+    },
+    {
+      "id": "traffic-spike",
+      "label": "Traffic spike",
+      "description": "Request volume exceeded catalog capacity.",
+      "supportScore": 0,
+      "contradictionScore": 0.85,
+      "confidence": 0,
+      "supportingEvidenceIds": [],
+      "contradictingEvidenceIds": [
+        "ev_7d80208bff84ed58"
+      ]
+    },
+    {
+      "id": "database-locks",
+      "label": "Database lock contention",
+      "description": "Lock waits slowed catalog reads.",
+      "supportScore": 0,
+      "contradictionScore": 0.9,
+      "confidence": 0,
+      "supportingEvidenceIds": [],
+      "contradictingEvidenceIds": [
+        "ev_0092c2dafe44ad23"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "sourceKind": "incident",
+      "sourceName": "synthetic-incident-archive",
+      "locator": "incident:INC-0955",
+      "observedAt": "2026-07-02T11:00:00.000Z",
+      "summary": "A previous cache bypass caused the same hit-rate and origin-latency signature.",
+      "details": {
+        "resolution": "Disabled bypass and warmed hot keys"
+      },
+      "claims": [
+        {
+          "hypothesisId": "cache-bypass",
+          "stance": "supports",
+          "weight": 0.75
+        }
+      ],
+      "id": "ev_194753b1ec5bad59",
+      "digest": "194753b1ec5bad591d9d5a44712b8909215c499adeb0bffdac71dd1713aa4f54",
+      "ingestedAt": "2026-10-22T17:35:50.313Z",
+      "runId": "run_ab1906a6-4fe5-46d3-90de-d43c64409595",
+      "agent": "ingest-pipeline"
+    },
+    {
+      "sourceKind": "runbook",
+      "sourceName": "synthetic-catalog-runbook",
+      "locator": "runbook:catalog:cache-regression",
+      "observedAt": "2026-09-12T00:00:00.000Z",
+      "summary": "For a cache hit-rate regression, canary-disable the latest policy and warm the affected prefix.",
+      "details": {
+        "recommendedAction": "Canary-disable cache-policy-v3 for product-detail keys and warm that prefix."
+      },
+      "claims": [
+        {
+          "hypothesisId": "cache-bypass",
+          "stance": "context",
+          "weight": 0.4
+        }
+      ],
+      "id": "ev_4dea37d0b023d988",
+      "digest": "4dea37d0b023d988183fb1d27e224ecaaa764573c05bdc84f3499d4cd9c94131",
+      "ingestedAt": "2026-10-22T17:35:50.313Z",
+      "runId": "run_ab1906a6-4fe5-46d3-90de-d43c64409595",
+      "agent": "ingest-pipeline"
+    },
+    {
+      "sourceKind": "deployment",
+      "sourceName": "synthetic-deploy-log",
+      "locator": "deploy:catalog:cache-policy-v3",
+      "observedAt": "2026-10-22T14:30:00.000Z",
+      "summary": "Cache policy v3 enabled bypass for the product-detail key prefix four minutes before latency rose.",
+      "details": {
+        "flag": "cache-policy-v3",
+        "changedPrefix": "product-detail"
+      },
+      "claims": [
+        {
+          "hypothesisId": "cache-bypass",
+          "stance": "supports",
+          "weight": 1
+        }
+      ],
+      "id": "ev_7e0e1c1e1a0d830f",
+      "digest": "7e0e1c1e1a0d830f61ed7d28a802d28fb65232568e2c13b9ac9725c1e82da03e",
+      "ingestedAt": "2026-10-22T17:35:50.313Z",
+      "runId": "run_ab1906a6-4fe5-46d3-90de-d43c64409595",
+      "agent": "ingest-pipeline"
+    },
+    {
+      "sourceKind": "metric",
+      "sourceName": "synthetic-metrics",
+      "locator": "catalog:p95:14:34",
+      "observedAt": "2026-10-22T14:34:00.000Z",
+      "summary": "Catalog p95 rose from 180 ms to 980 ms as cache hit rate fell from 91% to 38%; traffic stayed flat.",
+      "details": {
+        "p95BeforeMs": 180,
+        "p95AfterMs": 980,
+        "cacheHitBeforePercent": 91,
+        "cacheHitAfterPercent": 38
+      },
+      "claims": [
+        {
+          "hypothesisId": "cache-bypass",
+          "stance": "supports",
+          "weight": 0.95
+        },
+        {
+          "hypothesisId": "traffic-spike",
+          "stance": "contradicts",
+          "weight": 0.85
+        }
+      ],
+      "id": "ev_7d80208bff84ed58",
+      "digest": "7d80208bff84ed58ec1eb3102766dc919527fa00e387c51c794ae61493e33693",
+      "ingestedAt": "2026-10-22T17:35:50.313Z",
+      "runId": "run_ab1906a6-4fe5-46d3-90de-d43c64409595",
+      "agent": "ingest-pipeline"
+    },
+    {
+      "sourceKind": "metric",
+      "sourceName": "synthetic-database-metrics",
+      "locator": "catalog:db-locks:14:34",
+      "observedAt": "2026-10-22T14:34:00.000Z",
+      "summary": "Database lock waits remained at baseline during the catalog regression.",
+      "details": {
+        "lockWaitP95Ms": 4,
+        "baselineP95Ms": 5
+      },
+      "claims": [
+        {
+          "hypothesisId": "database-locks",
+          "stance": "contradicts",
+          "weight": 0.9
+        }
+      ],
+      "id": "ev_0092c2dafe44ad23",
+      "digest": "0092c2dafe44ad23472783714f816d392ed3b8b5f40a499c2dd426ef8723d71a",
+      "ingestedAt": "2026-10-22T17:35:50.313Z",
+      "runId": "run_ab1906a6-4fe5-46d3-90de-d43c64409595",
+      "agent": "ingest-pipeline"
+    }
+  ],
+  "trace": [
+    {
+      "step": 1,
+      "agent": "planner",
+      "action": "Form a falsifiable investigation plan",
+      "observation": "planner completed against 4 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_7d80208bff84ed58",
+        "ev_0092c2dafe44ad23",
+        "ev_194753b1ec5bad59",
+        "ev_7e0e1c1e1a0d830f"
+      ]
+    },
+    {
+      "step": 2,
+      "agent": "investigator",
+      "action": "Score competing hypotheses (iteration 1)",
+      "observation": "investigator completed against 4 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_7d80208bff84ed58",
+        "ev_0092c2dafe44ad23",
+        "ev_194753b1ec5bad59",
+        "ev_7e0e1c1e1a0d830f"
+      ]
+    },
+    {
+      "step": 3,
+      "agent": "challenger",
+      "action": "Seek contradictions and source-diversity gaps",
+      "observation": "challenger completed against 4 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_7d80208bff84ed58",
+        "ev_0092c2dafe44ad23",
+        "ev_194753b1ec5bad59",
+        "ev_7e0e1c1e1a0d830f"
+      ]
+    },
+    {
+      "step": 4,
+      "agent": "evaluator",
+      "action": "Request bounded retry",
+      "observation": "evaluator completed against 4 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_7d80208bff84ed58",
+        "ev_0092c2dafe44ad23",
+        "ev_194753b1ec5bad59",
+        "ev_7e0e1c1e1a0d830f"
+      ]
+    },
+    {
+      "step": 5,
+      "agent": "investigator",
+      "action": "Score competing hypotheses (iteration 2)",
+      "observation": "investigator completed against 5 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_7d80208bff84ed58",
+        "ev_194753b1ec5bad59",
+        "ev_4dea37d0b023d988",
+        "ev_7e0e1c1e1a0d830f",
+        "ev_0092c2dafe44ad23"
+      ]
+    },
+    {
+      "step": 6,
+      "agent": "challenger",
+      "action": "Seek contradictions and source-diversity gaps",
+      "observation": "challenger completed against 5 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_7d80208bff84ed58",
+        "ev_194753b1ec5bad59",
+        "ev_4dea37d0b023d988",
+        "ev_7e0e1c1e1a0d830f",
+        "ev_0092c2dafe44ad23"
+      ]
+    },
+    {
+      "step": 7,
+      "agent": "evaluator",
+      "action": "Accept evidence coverage",
+      "observation": "evaluator completed against 5 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_7d80208bff84ed58",
+        "ev_194753b1ec5bad59",
+        "ev_4dea37d0b023d988",
+        "ev_7e0e1c1e1a0d830f",
+        "ev_0092c2dafe44ad23"
+      ]
+    },
+    {
+      "step": 8,
+      "agent": "synthesizer",
+      "action": "Produce a cited explanation and bounded next action",
+      "observation": "synthesizer completed against 5 cited evidence record(s); sample mode made no network call.",
+      "evidenceIds": [
+        "ev_7d80208bff84ed58",
+        "ev_194753b1ec5bad59",
+        "ev_4dea37d0b023d988",
+        "ev_7e0e1c1e1a0d830f",
+        "ev_0092c2dafe44ad23"
+      ]
+    }
+  ],
+  "provider": "deterministic-sample",
+  "startedAt": "2026-10-22T17:35:50.301Z",
+  "completedAt": "2026-10-22T17:35:50.322Z"
+}

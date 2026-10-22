@@ -1,0 +1,11 @@
+[
+  {
+    "sourceKind": "runbook",
+    "sourceName": "synthetic-checkout-runbook",
+    "locator": "runbook:checkout:payment-latency",
+    "observedAt": "2026-09-01T00:00:00.000Z",
+    "summary": "For payment latency above the checkout timeout, restore the last known-good timeout and cap retries before wider rollback.",
+    "details": { "recommendedAction": "Canary a restoration of the payments timeout to 3000 ms and cap retries at one." },
+    "claims": [{ "hypothesisId": "timeout-retry-cascade", "stance": "context", "weight": 0.4 }]
+  }
+]
