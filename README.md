@@ -94,7 +94,7 @@ tests/                  idempotency, traceability, retry, and fail-closed tests
 docs/                   architecture and sponsor integration details
 ```
 
-See [architecture](docs/architecture.md), [sponsor integration](docs/sponsor-integration.md), [data sources](docs/data-sources.md), the [three-minute demo script](docs/demo-script.md), and the [submission draft](docs/submission-draft.md).
+See [architecture](docs/architecture.md), [sponsor integration](docs/sponsor-integration.md), [data sources](docs/data-sources.md), the [three-minute demo script](docs/demo-script.md), [deck outline](docs/deck-outline.md), and [submission draft](docs/submission-draft.md).
 
 ## Safety and limitations
 
