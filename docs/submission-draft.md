@@ -50,8 +50,8 @@ Tracebound is decision support, not autonomous remediation. The bundled data is 
 ## Required links
 
 - Repository: https://github.com/sidsri14/tracebound
-- Demo video: pending
-- Slide deck: pending
+- Slide deck: https://github.com/sidsri14/tracebound/blob/main/docs/slide-deck.md (Interactive HTML: https://raw.githack.com/sidsri14/tracebound/main/docs/slides.html)
+- Demo video: pending recording from docs/demo-script.md
 
 ## Final submission gate
 
