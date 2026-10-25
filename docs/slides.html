@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tracebound — Evidence-First Incident Investigation Deck</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(21, 28, 44, 0.7);
+      --border: rgba(99, 102, 241, 0.2);
+      --border-bright: rgba(129, 140, 248, 0.5);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --primary: #6366f1;
+      --primary-light: #818cf8;
+      --accent: #06b6d4;
+      --accent-glow: rgba(6, 182, 212, 0.2);
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: radial-gradient(circle at 50% 20%, #151b30 0%, #090d16 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    .slide-viewport {
+      width: 100%;
+      max-width: 1100px;
+      height: 650px;
+      position: relative;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 40px rgba(99, 102, 241, 0.15);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 50px 60px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .slide-header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+      margin-bottom: 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: rgba(99, 102, 241, 0.15);
+      color: var(--primary-light);
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      font-weight: 400;
+    }
+
+    .slide-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: var(--border-bright);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    .card h3 {
+      font-size: 1.1rem;
+      color: var(--primary-light);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card p, .card ul {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    ul {
+      list-style-type: none;
+    }
+
+    li {
+      margin-bottom: 8px;
+      position: relative;
+      padding-left: 18px;
+    }
+
+    li::before {
+      content: "▹";
+      position: absolute;
+      left: 0;
+      color: var(--primary-light);
+    }
+
+    .code-box {
+      background: #060911;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: #38bdf8;
+      overflow-x: auto;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .pill-success {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .pill-danger {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .slide-footer {
+      border-top: 1px solid var(--border);
+      padding-top: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .nav-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 16px;
+    }
+
+    .btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .slide-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="slide-viewport">
+    
+    <!-- Slide 1: Title -->
+    <div class="slide active" id="slide-1">
+      <div class="slide-header">
+        <div>
+          <span class="badge">Open Agent Hackathon 2026</span>
+          <h1>Tracebound</h1>
+          <p class="subtitle">Evidence-First Incident Investigation for Resilient Systems</p>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="card">
+            <h3>🎯 The Mission</h3>
+            <p>An autonomous decision-support agent for SREs and incident commanders that eliminates alert ambiguity by evaluating competing causal hypotheses with verifiable evidence bounds.</p>
+          </div>
+          <div class="card">
+            <h3>⚡ Core Innovations</h3>
+            <ul>
+              <li><strong>Zero Hallucination:</strong> Cites immutable World Model records (`ev_...`).</li>
+              <li><strong>Challenger Loop:</strong> Detects omitted dimensions and forces bounded retries.</li>
+              <li><strong>Reversible Actions:</strong> Prescribes safe remediation without side-effects.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="code-box">
+          Built for Track 2: The Agent That Can Explain Why | Author: Siddharth Srivastava (@sidsri14)
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>https://github.com/sidsri14/tracebound</span>
+        <span>Slide 1 / 7</span>
+      </div>
+    </div>
+
+    <!-- Slide 2: The Problem -->
+    <div class="slide" id="slide-2">
+      <div class="slide-header">
+        <div>
+          <span class="badge">The Operational Reality</span>
+          <h2>Alerts Tell What, Not Why</h2>
+          <p class="subtitle">Why traditional on-call triage fails under pressure</p>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-3">
+          <div class="card">
+            <h3>🚨 Fragmented Telemetry</h3>
+            <p>A checkout p95 latency surge triggers 20+ alerts across services, deployment pipelines, database caches, and third-party payment rails.</p>
+          </div>
+          <div class="card">
+            <h3>⚠️ LLM Hallucinations</h3>
+            <p>Generic AI summaries grab the first visible correlation (e.g., "DB traffic spike"), ignoring contradictory evidence and recommending dangerous fixes.</p>
+          </div>
+          <div class="card">
+            <h3>🔒 Evidence Gaps</h3>
+            <p>Responders cannot verify what data was reviewed or omitted, leading to protracted outages and prolonged Mean Time To Resolution (MTTR).</p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Tracebound SRE Architecture</span>
+        <span>Slide 2 / 7</span>
+      </div>
+    </div>
+
+    <!-- Slide 3: Architecture -->
+    <div class="slide" id="slide-3">
+      <div class="slide-header">
+        <div>
+          <span class="badge">Multi-Stage Reasoning Loop</span>
+          <h2>Tracebound Architecture</h2>
+          <p class="subtitle">Asynchronous, bounded 5-stage investigative loop</p>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="card">
+            <h3>1. Ingest & World Model</h3>
+            <p>Meterless WorldStoreService derives SHA-256 digests and stable IDs (<code>ev_...</code>), deduplicating records across APM, git, and logs.</p>
+          </div>
+          <div class="card">
+            <h3>2. Planner & Investigator</h3>
+            <p>Slices evidence and computes explicit Support and Contradiction scores across competing hypotheses.</p>
+          </div>
+          <div class="card">
+            <h3>3. Challenger & Evaluator</h3>
+            <p>Audits coverage for missing dimensions. Rejects weak first passes and allows exactly one widened retry.</p>
+          </div>
+          <div class="card">
+            <h3>4. Synthesizer</h3>
+            <p>Emits an inspectable explanation citing verified evidence IDs and recommends a bounded, reversible mitigation.</p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Bounded Execution (Max 2 Iterations)</span>
+        <span>Slide 3 / 7</span>
+      </div>
+    </div>
+
+    <!-- Slide 4: Sponsor Tech -->
+    <div class="slide" id="slide-4">
+      <div class="slide-header">
+        <div>
+          <span class="badge">Sponsor Integration</span>
+          <h2>Powered by Hackathon Sponsors</h2>
+          <p class="subtitle">Deep technological alignment with Zetaris, Meterless, and NVIDIA</p>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="card">
+            <h3>🌐 Zetaris (Data Layer)</h3>
+            <p>REST SQL adapter querying governed, federated data sources. Converts raw rows into structured, immutable World Model entries.</p>
+          </div>
+          <div class="card">
+            <h3>🧠 Meterless World Model Engine</h3>
+            <p>Custom <code>WorldStoreService</code>, <code>IngestPipelineService</code>, and <code>ContextBuilderService</code> for state preservation and contextual retrieval.</p>
+          </div>
+          <div class="card">
+            <h3>⚡ Meterless Nightshift</h3>
+            <p>Primary OpenAI-compatible reasoning engine handling multi-agent orchestration across Planner, Investigator, and Challenger.</p>
+          </div>
+          <div class="card">
+            <h3>🚀 NVIDIA Nemotron</h3>
+            <p>Inference pipeline designed for high-precision causal analysis, recording true routed models in execution metadata.</p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Fail-Closed Security Design</span>
+        <span>Slide 4 / 7</span>
+      </div>
+    </div>
+
+    <!-- Slide 5: Real Incident Walkthrough -->
+    <div class="slide" id="slide-5">
+      <div class="slide-header">
+        <div>
+          <span class="badge">Incident Case Study</span>
+          <h2>Synthetic Checkout Latency Cascade</h2>
+          <p class="subtitle">How Tracebound verified the real root cause under competing hypotheses</p>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-3">
+          <div class="card">
+            <h3>Hypothesis A</h3>
+            <p><strong>Traffic Spike</strong></p>
+            <span class="pill pill-danger">CONTRADICTED</span>
+            <p style="margin-top: 8px;">Request rate remained flat at 1,200 RPS (<code>ev_req_rate</code>).</p>
+          </div>
+          <div class="card">
+            <h3>Hypothesis B</h3>
+            <p><strong>Database Saturation</strong></p>
+            <span class="pill pill-danger">CONTRADICTED</span>
+            <p style="margin-top: 8px;">DB thread pool utilization held steady at 38% (<code>ev_db_pool</code>).</p>
+          </div>
+          <div class="card">
+            <h3>Hypothesis C</h3>
+            <p><strong>Timeout & Retry Storm</strong></p>
+            <span class="pill pill-success">VERIFIED (85.4%)</span>
+            <p style="margin-top: 8px;">Deploy cut timeout to 1,500ms; retries surged 3.1x into order queue.</p>
+          </div>
+        </div>
+        <div class="code-box">
+          Reversible Remediation: Canary rollback of timeout to 3,000ms & cap retries at 1.
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Automated Diagnostic Resolution</span>
+        <span>Slide 5 / 7</span>
+      </div>
+    </div>
+
+    <!-- Slide 6: Engineering Rigor -->
+    <div class="slide" id="slide-6">
+      <div class="slide-header">
+        <div>
+          <span class="badge">Validation & Test Suite</span>
+          <h2>Verified Engineering Rigor</h2>
+          <p class="subtitle">Deterministic reliability, clean audits, and continuous verification</p>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="card">
+            <h3>🧪 100% Test Coverage</h3>
+            <p><strong>9/9 automated tests passing:</strong> Idempotent ingest, selection reasons, bounded retries, all three synthetic cases, and fail-closed security.</p>
+          </div>
+          <div class="card">
+            <h3>🐳 Container & Security Ready</h3>
+            <p>Multi-stage Linux Docker build verified. Zero npm vulnerabilities, and strict secret-pattern scanners enforced.</p>
+          </div>
+          <div class="card">
+            <h3>🖥️ Developer HUD</h3>
+            <p>Responsive, zero-build web interface providing inspectable evidence graphs, model routing attribution, and execution timelines.</p>
+          </div>
+          <div class="card">
+            <h3>🔄 Continuous Integration</h3>
+            <p>GitHub Actions CI passing across Node.js 20, 22, and 24 platforms.</p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>npm test: 9 passed, 0 failed</span>
+        <span>Slide 6 / 7</span>
+      </div>
+    </div>
+
+    <!-- Slide 7: Conclusion -->
+    <div class="slide" id="slide-7">
+      <div class="slide-header">
+        <div>
+          <span class="badge">Future & Conclusion</span>
+          <h2>The Future of Incident Intelligence</h2>
+          <p class="subtitle">Tracebound bridges autonomous agents with human accountability</p>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="card">
+            <h3>📦 What We Built</h3>
+            <ul>
+              <li>Evidence-first causal reasoning engine for SRE teams.</li>
+              <li>Complete integration with Zetaris SQL and Meterless Nightshift.</li>
+              <li>Immutable World Model with cryptographic auditability.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>🔮 Next Milestones</h3>
+            <ul>
+              <li>eBPF kernel-level telemetry ingestion via Cilium.</li>
+              <li>Two-way Slack and PagerDuty incident incident-bot workflows.</li>
+              <li>Automated post-mortem report generation with signed proofs.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="code-box">
+          GitHub Repository: https://github.com/sidsri14/tracebound | MIT License
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Team Tracebound | Open Agent Hackathon 2026</span>
+        <span>Slide 7 / 7</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="nav-controls">
+    <button class="btn" id="prev-btn" onclick="prevSlide()">← Previous</button>
+    <span class="slide-number" id="slide-counter">Slide 1 of 7</span>
+    <button class="btn" id="next-btn" onclick="nextSlide()">Next →</button>
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 7;
+
+    function showSlide(index) {
+      document.querySelectorAll('.slide').forEach(slide => slide.classList.remove('active'));
+      const activeSlide = document.getElementById(`slide-${index}`);
+      if (activeSlide) {
+        activeSlide.classList.add('active');
+      }
+      document.getElementById('slide-counter').innerText = `Slide ${index} of ${totalSlides}`;
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        showSlide(currentSlide);
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        currentSlide--;
+        showSlide(currentSlide);
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        prevSlide();
+      }
+    });
+  </script>
+</body>
+</html>
