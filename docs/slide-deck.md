@@ -1,103 +1,125 @@
-# Tracebound — Slide Deck Presentation
+# Tracebound - Open Agent Hackathon Deck
 
-**Event:** Open Agent Hackathon 2026  
-**Track:** Track 2 — The Agent That Can Explain Why  
-**Project:** Tracebound: Evidence-First Incident Investigation Agent  
-**Author:** Siddharth Srivastava (`@sidsri14`)  
-**Repository:** https://github.com/sidsri14/tracebound  
+**Event:** Open Agent Hackathon 2026
 
----
+**Track:** The Agent That Can Explain Why
 
-## Slide 1: Title Slide
-- **Title:** Tracebound
-- **Subtitle:** Evidence-First Incident Investigation for Resilient Systems
-- **Core Value Proposition:** An autonomous agent that doesn't just guess root cause — it joins fragmented telemetry, tests competing hypotheses, detects evidence gaps, and explains *why*.
-- **Presenter:** Siddharth Srivastava (Solo / Team Tracebound)
-- **Track:** Track 2: The Agent That Can Explain Why
+**Project:** Tracebound - Evidence-First Incident Investigation
 
----
+**Author:** Siddharth Srivastava (`@sidsri14`)
 
-## Slide 2: The SRE Dilemma — Alerts Tell What, Not Why
-- **The Operational Reality:** When production metrics spike (e.g., checkout p95 latency jumps from 400ms to 2,100ms), engineers are flooded with fragmented signals:
-  - APM alerts fire across 10 microservices.
-  - Deployment logs show 4 recent merges.
-  - Database dashboards show elevated thread contention.
-  - Third-party payment gateways report degraded network health.
-- **The Risk of Plausible Hallucinations:** Generic LLM assistants generate persuasive summaries that often latch onto the first correlation (e.g., "traffic spike" or "DB overload"), ignoring conflicting data and missing the real root cause.
-- **The Tracebound Mandate:** Decision support requires verifiable provenance, explicit contradiction testing, and calibrated evidence bounds.
+**Repository:** https://github.com/sidsri14/tracebound
+
+The downloadable PowerPoint is `docs/Tracebound-Open-Agent-Hackathon-Deck.pptx`.
+
+## Accuracy boundary
+
+- Every bundled incident is synthetic.
+- `85.4%` is deterministic sample confidence, not a calibrated production probability.
+- Sponsor adapters and hermetic tests are implemented; a real Zetaris/Nightshift/NVIDIA end-to-end run remains pending account-owner setup.
+- Tracebound recommends a reversible action. It never executes remediation.
 
 ---
 
-## Slide 3: The Architecture — Bounded Multi-Stage Agent Loop
-Tracebound implements an asynchronous, 5-stage bounded investigative loop:
+## Slide 1 - Do not just name the cause. Show why.
 
-1. **Ingest Pipeline & World Model (`Meterless WorldStoreService`):**
-   - Normalizes disparate telemetry into immutable records with SHA-256 digests and stable IDs (`ev_...`).
-   - Prevents duplicate ingestion and preserves strict time bounds.
-2. **The Planner:** Selects an initial bounded evidence slice from the World Model based on alert severity.
-3. **The Investigator:** Evaluates competing hypotheses (Deploy regression vs. Traffic surge vs. Database saturation) with explicit support and contradiction scoring.
-4. **The Challenger:** Audits evidence coverage — detects missing data dimensions (e.g., "no deploy logs examined") and challenges premature convergence.
-5. **The Evaluator & Loop Governor:**
-   - Evaluates whether confidence meets the threshold.
-   - Triggers one bounded retry with widened evidence scope if evidence is incomplete.
-   - Enforces a strict max-iteration ceiling (never loops infinitely).
-6. **The Synthesizer:** Emits a cited conclusion linking every claim to verified `ev_...` records, along with a reversible mitigation action.
+Tracebound is an evidence-first incident agent that tests competing explanations, preserves provenance, and recommends a reversible next step.
+
+The sample result is a payments timeout and retry cascade with five supporting records and no contradicting record.
 
 ---
 
-## Slide 4: Sponsor Technology Integration
-Built strictly around the hackathon's core technological requirements:
+## Slide 2 - Symptoms arrive fast. Proof does not.
 
-- **Zetaris (Data Layer):**
-  - High-performance REST SQL adapter querying federated production metrics and event logs.
-  - Transforms raw SQL rows into provenance-tagged World Model entries with zero data loss.
-- **Meterless World Model Engine:**
-  - Implemented via `WorldStoreService`, `IngestPipelineService`, and `ContextBuilderService`.
-  - Powers deterministic deduplication, contextual ranking, and audit logging.
-- **Meterless Nightshift (Primary Reasoning Engine):**
-  - OpenAI-compatible async runtime powering the Planner, Investigator, Challenger, and Synthesizer stages.
-  - Captures and records the exact routed model (including NVIDIA Nemotron) in telemetry metadata.
-- **NVIDIA AI Computing:**
-  - Designed for Nemotron inference pipelines through Nightshift to guarantee high-precision causal reasoning.
+Operational truth is fragmented across metrics, deployments, incident history, and runbooks. A dashboard can show that checkout errors rose, but it cannot prove whether the cause was a deploy, traffic spike, database saturation, or a downstream dependency.
+
+A plausible summary is not enough when omitted evidence changes the response.
 
 ---
 
-## Slide 5: Real Synthetic Incident Walkthrough
-**Scenario: The Checkout Latency Cascade**
+## Slide 3 - One answer stays inspectable.
 
-- **Symptoms:** Checkout p95 response time jumped to 2,100ms; error rate spiked to 14.2%.
-- **Competing Hypotheses Evaluated:**
-  1. *Hypothesis A (Traffic Surge):* Contradicted. Ingestion showed request rate remained flat at 1,200 RPS (`ev_req_rate`).
-  2. *Hypothesis B (Database Saturation):* Contradicted. Connection pool utilization remained at a healthy 38% (`ev_db_pool`).
-  3. *Hypothesis C (Payment Gateway Timeout & Retry Storm):* **VERIFIED (85.4% Confidence).**
-     - Deployment `deploy_payments_v2.4` reduced gateway timeout from 3,000ms to 1,500ms.
-     - Upstream p95 latency was 1,800ms, causing premature client timeouts.
-     - Retry setting increased from 1 to 3, triggering a 3.1x synthetic retry storm that cascaded through the order worker queue.
-- **Reversible Action:** Canary rollback of timeout ceiling to 3,000ms and set max retries to 1. Zero destructive code mutations.
+The bundled synthetic checkout case returns:
+
+- Leading explanation: payments timeout and retry cascade.
+- Deterministic sample confidence: `85.4%`.
+- Evidence: five supporting records and no contradicting record for the winning hypothesis.
+- Reversible action: canary the previous 3,000 ms timeout and cap retries at one.
+
+The product screenshot shows the competing hypotheses, complete agent audit trail, and cited evidence IDs.
 
 ---
 
-## Slide 6: Verification & Engineering Rigor
-- **100% Automated Test Coverage:**
-  - 9/9 passing tests across idempotent ingest, contextual ranking, bounded retry loops, fail-closed adapters, and multi-hypothesis evaluation.
-- **Zero Hallucination Guarantee:**
-  - Fail-closed design: If Zetaris or Nightshift credentials fail, the system reports explicit diagnostic errors instead of faking data.
-- **Production-Ready Packaging:**
-  - Multi-stage Linux Docker build verified.
-  - Accessible, responsive developer HUD with inspectable evidence graph and full SHA-256 audit trail.
-- **Green CI/CD:** Passing on Node 20/22/24 on GitHub Actions.
+## Slide 4 - The first pass is not the final answer.
+
+Tracebound uses a bounded sequence:
+
+1. Planner forms a falsifiable plan.
+2. Investigator scores competing hypotheses.
+3. Challenger finds evidence gaps and contradictions.
+4. Evaluator accepts the evidence or requests one broader retry.
+5. Synthesizer emits the cited explanation and reversible action.
+
+There are at most two investigation passes. The system never enters an unbounded reflection loop.
 
 ---
 
-## Slide 7: Summary & What's Next
-- **What We Delivered:**
-  - A production-grade, evidence-first incident reasoning agent.
-  - Verified integration with Zetaris SQL federation and Meterless World Model / Nightshift.
-  - Transparent, explainable causal chains that empower human SREs.
-- **Roadmap:**
-  - Automated OpenTelemetry eBPF trace correlation.
-  - Bi-directional PagerDuty / Slack incident commander bot integration.
-  - Cryptographic attestation of post-mortem root cause analysis.
-- **Links:**
-  - Repository: `https://github.com/sidsri14/tracebound`
-  - License: MIT Open Source
+## Slide 5 - Support and contradiction separate the cause.
+
+The winning evidence chain is:
+
+1. A deployment reduced the payments timeout from 3,000 ms to 1,500 ms and increased retries from one to three.
+2. Payments p95 latency reached 2,100 ms, crossing the new timeout.
+3. Retry volume rose 3.1x while request volume stayed flat.
+
+Two alternatives are contradicted:
+
+- Unexpected traffic spike: request volume stayed flat.
+- Primary database saturation: utilization remained in its normal band at 62%.
+
+The best explanation must survive alternatives, not merely sound plausible.
+
+---
+
+## Slide 6 - Sponsor technology sits on the decision path.
+
+- **Zetaris:** retrieves governed evidence through bounded REST SQL.
+- **Meterless World Model Engine:** validates, deduplicates, ranks, and explains context selection.
+- **Meterless Nightshift:** runs each live reasoning stage through its OpenAI-compatible runtime.
+- **NVIDIA route:** Tracebound records the model actually returned and never assumes a Nemotron route.
+
+Implementation status: adapters and hermetic tests are complete. Live end-to-end account verification is pending. If a provider fails, live mode stops; sample output is never substituted silently.
+
+---
+
+## Slide 7 - Reproducible software, not a mock-up.
+
+- Nine passing automated tests.
+- Three synthetic incident cases.
+- Two maximum investigation passes.
+- Zero production dependency vulnerabilities.
+
+Additional proof includes a passing TypeScript build and typecheck, browser UI, public MIT repository, Docker/API smoke verification, stable evidence IDs, and an append-only JSONL trace.
+
+These local checks do not claim that live sponsor calls have been completed.
+
+---
+
+## Slide 8 - Evidence is visible. Hidden reasoning stays private.
+
+- **Provenance:** stable content-derived IDs and source locators keep claims traceable.
+- **Falsifiability:** every hypothesis can receive supporting and contradicting evidence.
+- **Bounded reflection:** one broader retry improves coverage without an unbounded agent loop.
+- **Operational safety:** the recommendation is reversible and Tracebound never executes remediation.
+
+---
+
+## Slide 9 - If you cannot inspect why, do not act.
+
+Tracebound turns a plausible explanation into a testable decision record:
+
+- Explain by linking every claim to evidence and provenance.
+- Challenge competing causes before accepting an answer.
+- Act safely by recommending the smallest reversible next step.
+
+Next: verify a non-secret live sponsor run, then extend governed connectors.

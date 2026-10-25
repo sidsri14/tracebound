@@ -50,10 +50,11 @@ Tracebound is decision support, not autonomous remediation. The bundled data is 
 ## Required links
 
 - Repository: https://github.com/sidsri14/tracebound
-- Slide deck: https://github.com/sidsri14/tracebound/blob/main/docs/slide-deck.md (Interactive HTML: https://raw.githack.com/sidsri14/tracebound/main/docs/slides.html)
+- Slide deck (PowerPoint): https://github.com/sidsri14/tracebound/raw/refs/heads/main/docs/Tracebound-Open-Agent-Hackathon-Deck.pptx
+- Slide transcript: https://github.com/sidsri14/tracebound/blob/main/docs/slide-deck.md
+- Interactive HTML: https://raw.githack.com/sidsri14/tracebound/main/docs/slides.html
 - Demo video: pending recording from docs/demo-script.md
 
 ## Final submission gate
 
-Before creating the first HackOS submission, verify the live sponsor path or preserve the pending disclosure, record the 1-4 minute demo, create the slide deck, re-run all checks, scan for secrets, and review any legal attestations manually. The first submission locks team composition.
-
+Before creating the first HackOS submission, verify the live sponsor path or preserve the pending disclosure, record the 1-4 minute demo, re-run all checks, scan for secrets, and review any legal attestations manually. The slide deck is complete. The first submission locks team composition.
