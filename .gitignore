@@ -4,5 +4,7 @@ dist/
 output/*.json
 logs/*.jsonl
 coverage/
+demo/work/
+demo/*-raw.webm
 *.log
 .DS_Store

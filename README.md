@@ -35,6 +35,18 @@ Open `http://127.0.0.1:3000`. The CLI writes the complete result to `output/samp
 
 Three synthetic input/output pairs live under `examples/`. They cover checkout retries, a catalog cache regression, and an authentication resolver failure.
 
+## Demo package
+
+The repository includes a **2 minute 49 second** narrated demo at [demo/Tracebound-Open-Agent-Hackathon-Demo.mp4](demo/Tracebound-Open-Agent-Hackathon-Demo.mp4). It combines the real local interface with the submission deck, includes burned-in captions, and explicitly labels the run as deterministic sample mode with live sponsor verification still pending.
+
+On Windows, rebuild the video from the checked-in frames and narration with:
+
+```bash
+npm run demo:video
+```
+
+The final MP4 is 1440x900 H.264/AAC. Its SHA-256 is `5F66F0EF3C722CF4BE3C7BA2914BBC2762E97E9F3897F4BD281E397E6BF38E18`.
+
 The multi-stage Docker image also builds cleanly from WSL2/Linux:
 
 ```bash

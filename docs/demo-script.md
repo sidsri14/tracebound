@@ -91,10 +91,11 @@ Use exactly one of these variants.
 
 ## Recording acceptance checks
 
+Rendered artifact: `demo/Tracebound-Open-Agent-Hackathon-Demo.mp4` (169.115 seconds, 1440x900 H.264/AAC). SHA-256: `5F66F0EF3C722CF4BE3C7BA2914BBC2762E97E9F3897F4BD281E397E6BF38E18`.
+
 - Length is between 1 and 4 minutes.
 - Text and evidence IDs are readable at 1080p or better.
 - Audio contains no unsupported claim of production use or live sponsor verification.
 - The synthetic-data label is visible.
 - No secrets, personal email, OTP, API key, token, or local `.env` value appears.
 - The final frame includes `https://github.com/sidsri14/tracebound`.
-
