@@ -39,6 +39,8 @@ Three synthetic input/output pairs live under `examples/`. They cover checkout r
 
 The repository includes a **2 minute 49 second** narrated demo at [demo/Tracebound-Open-Agent-Hackathon-Demo.mp4](demo/Tracebound-Open-Agent-Hackathon-Demo.mp4). It combines the real local interface with the submission deck, includes burned-in captions, and explicitly labels the run as deterministic sample mode with live sponsor verification still pending.
 
+For submission and judging, the same verified MP4 and PowerPoint deck are available as versioned assets in the [Open Agent Hackathon release](https://github.com/sidsri14/tracebound/releases/tag/v0.1.0-hackathon).
+
 On Windows, rebuild the video from the checked-in frames and narration with:
 
 ```bash

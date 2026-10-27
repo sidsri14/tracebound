@@ -53,7 +53,8 @@ Tracebound is decision support, not autonomous remediation. The bundled data is 
 - Slide deck (PowerPoint): https://github.com/sidsri14/tracebound/raw/refs/heads/main/docs/Tracebound-Open-Agent-Hackathon-Deck.pptx
 - Slide transcript: https://github.com/sidsri14/tracebound/blob/main/docs/slide-deck.md
 - Interactive HTML: https://raw.githack.com/sidsri14/tracebound/main/docs/slides.html
-- Demo video artifact: `demo/Tracebound-Open-Agent-Hackathon-Demo.mp4` (2:49, 1440x900, H.264/AAC, burned-in captions)
+- Versioned release bundle: https://github.com/sidsri14/tracebound/releases/tag/v0.1.0-hackathon
+- Demo video: https://github.com/sidsri14/tracebound/releases/download/v0.1.0-hackathon/Tracebound-Open-Agent-Hackathon-Demo.mp4 (2:49, 1440x900, H.264/AAC, burned-in captions)
 - Demo SHA-256: `5F66F0EF3C722CF4BE3C7BA2914BBC2762E97E9F3897F4BD281E397E6BF38E18`
 
 ## Final submission gate
